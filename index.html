@@ -1,13 +1,1053 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uz">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BrandFlow — Kontent Boshqaruv Tizimi</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Suvchilar Maktabi — Zamonaviy Suv Tejovchi Sug'orish Texnologiyalari</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-dark: rgb(60,75,220);
+      --blue-main: rgb(80,120,255);
+      --blue-light: rgba(80,120,255,0.12);
+      --white: #ffffff;
+      --black: #0a0a0a;
+      --gray: #f5f7ff;
+      --text-dark: #111827;
+      --text-muted: #6b7280;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(60,75,220,0.10);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; color: var(--text-dark); background: var(--white); }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue-main); color: var(--white);
+      padding: 14px 28px; border-radius: 50px; font-weight: 600;
+      font-size: 15px; border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--blue-main);
+      padding: 13px 28px; border-radius: 50px; font-weight: 600;
+      font-size: 15px; border: 2px solid var(--blue-main); cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { background: var(--blue-main); color: var(--white); }
+    .section-label {
+      display: inline-block; background: var(--blue-light);
+      color: var(--blue-main); font-weight: 600; font-size: 13px;
+      padding: 6px 16px; border-radius: 50px; margin-bottom: 16px; letter-spacing: 0.5px;
+    }
+    .section-title { font-size: clamp(28px,4vw,42px); font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+    .section-desc { font-size: 17px; color: var(--text-muted); line-height: 1.7; max-width: 600px; }
+
+
+    /* ===== TOPBAR ===== */
+    .topbar {
+      background: var(--blue-dark); color: var(--white);
+      padding: 10px 0; font-size: 13px;
+    }
+    .topbar .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .topbar-info { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+    .topbar-info span { display: flex; align-items: center; gap: 6px; opacity: 0.9; }
+    .topbar-info a { opacity: 0.9; transition: opacity 0.2s; }
+    .topbar-info a:hover { opacity: 1; }
+    .topbar-right { display: flex; align-items: center; gap: 16px; }
+    .lang-btn {
+      background: rgba(255,255,255,0.2); color: var(--white);
+      border: 1px solid rgba(255,255,255,0.3); padding: 4px 14px;
+      border-radius: 50px; font-size: 13px; cursor: pointer; font-weight: 500;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white); border-bottom: 1px solid rgba(60,75,220,0.08);
+      box-shadow: 0 2px 16px rgba(60,75,220,0.07);
+    }
+    .header .container { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; color: var(--blue-dark); }
+    .logo-icon { width: 40px; height: 40px; background: var(--blue-main); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .logo-icon svg { width: 24px; height: 24px; fill: white; }
+    nav { display: flex; align-items: center; gap: 4px; }
+    nav a {
+      padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      color: var(--text-dark); transition: all 0.2s;
+    }
+    nav a:hover, nav a.active { background: var(--blue-light); color: var(--blue-main); }
+    .header-cta { display: flex; align-items: center; gap: 12px; }
+    .burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
+    .burger span { width: 24px; height: 2px; background: var(--text-dark); border-radius: 2px; transition: 0.3s; }
+    .mobile-menu {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--white); z-index: 200; padding: 24px;
+      flex-direction: column; gap: 8px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { padding: 14px 16px; font-size: 16px; font-weight: 500; border-radius: 12px; }
+    .mobile-menu a:hover { background: var(--blue-light); color: var(--blue-main); }
+    .mobile-close { align-self: flex-end; font-size: 28px; cursor: pointer; color: var(--text-muted); margin-bottom: 16px; }
+
+
+    /* ===== HERO ===== */
+    .hero {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-main) 100%);
+      color: var(--white); padding: 90px 0 80px; overflow: hidden; position: relative;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -80px; right: -80px;
+      width: 500px; height: 500px; background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -100px; left: 30%;
+      width: 300px; height: 300px; background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 8px 18px; border-radius: 50px; font-size: 13px; font-weight: 500; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.2); }
+    .hero-badge span { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(1.3)} }
+    .hero h1 { font-size: clamp(32px,4.5vw,54px); font-weight: 800; line-height: 1.15; margin-bottom: 20px; }
+    .hero h1 span { color: #93c5fd; }
+    .hero-desc { font-size: 17px; opacity: 0.85; line-height: 1.7; margin-bottom: 36px; max-width: 480px; }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+    .btn-white { background: var(--white); color: var(--blue-dark); padding: 14px 28px; border-radius: 50px; font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+    .btn-ghost { background: rgba(255,255,255,0.15); color: var(--white); padding: 14px 28px; border-radius: 50px; font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.3); transition: all 0.2s; }
+    .btn-ghost:hover { background: rgba(255,255,255,0.25); }
+    .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+    .hero-stat { display: flex; flex-direction: column; gap: 4px; }
+    .hero-stat-num { font-size: 32px; font-weight: 800; }
+    .hero-stat-label { font-size: 13px; opacity: 0.75; }
+    .hero-stat-divider { width: 1px; background: rgba(255,255,255,0.2); }
+    .hero-media { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px; height: 400px; }
+    .hero-media-item { border-radius: 16px; overflow: hidden; background: rgba(255,255,255,0.1); }
+    .hero-media-item:first-child { grid-row: span 2; }
+    .hero-media-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+    .hero-media-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+
+
+    /* ===== VAZIFA ===== */
+    .vazifa { padding: 90px 0; background: var(--white); }
+    .vazifa .container { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .vazifa-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .vazifa-card { background: var(--gray); border-radius: var(--radius); padding: 28px 24px; transition: all 0.3s; border: 2px solid transparent; }
+    .vazifa-card:hover { border-color: var(--blue-main); background: var(--blue-light); transform: translateY(-4px); box-shadow: var(--shadow); }
+    .vazifa-card-icon { width: 48px; height: 48px; background: var(--blue-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 22px; }
+    .vazifa-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+    .vazifa-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+    .vazifa-img { position: relative; }
+    .vazifa-img img { border-radius: 24px; width: 100%; height: 480px; object-fit: cover; }
+    .vazifa-img-badge { position: absolute; bottom: 24px; left: 24px; right: 24px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 20px 24px; box-shadow: var(--shadow); }
+    .vazifa-img-badge strong { display: block; font-size: 18px; font-weight: 800; color: var(--blue-dark); }
+    .vazifa-img-badge span { font-size: 13px; color: var(--text-muted); }
+
+    /* ===== STATISTIKA ===== */
+    .statistika { background: linear-gradient(135deg, var(--blue-dark), var(--blue-main)); padding: 80px 0; }
+    .statistika .container { display: grid; grid-template-columns: repeat(4,1fr); gap: 32px; }
+    .stat-item { text-align: center; color: var(--white); }
+    .stat-num { font-size: clamp(36px,5vw,56px); font-weight: 800; margin-bottom: 8px; }
+    .stat-num span { font-size: 0.6em; font-weight: 600; opacity: 0.8; }
+    .stat-label { font-size: 15px; opacity: 0.8; line-height: 1.5; }
+
+    /* ===== EKSPERTLAR ===== */
+    .ekspertlar { padding: 90px 0; background: var(--gray); }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header .section-desc { margin: 0 auto; }
+    .ekspertlar-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }
+    .ekspert-card { background: var(--white); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: transform 0.3s; }
+    .ekspert-card:hover { transform: translateY(-6px); }
+    .ekspert-img { height: 240px; overflow: hidden; }
+    .ekspert-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+    .ekspert-card:hover .ekspert-img img { transform: scale(1.05); }
+    .ekspert-info { padding: 20px; }
+    .ekspert-info h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .ekspert-info .role { font-size: 13px; color: var(--blue-main); font-weight: 600; margin-bottom: 8px; }
+    .ekspert-info .country { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+
+
+    /* ===== MAQOLALAR ===== */
+    .maqolalar { padding: 90px 0; background: var(--white); }
+    .maqolalar-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
+    .maqola-card { border-radius: var(--radius); overflow: hidden; border: 1px solid rgba(60,75,220,0.1); transition: all 0.3s; }
+    .maqola-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
+    .maqola-img { height: 200px; overflow: hidden; background: var(--blue-light); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .maqola-img img { width: 100%; height: 100%; object-fit: cover; }
+    .maqola-body { padding: 24px; }
+    .maqola-cat { display: inline-block; background: var(--blue-light); color: var(--blue-main); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 50px; margin-bottom: 12px; }
+    .maqola-body h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; line-height: 1.4; }
+    .maqola-body p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+    .maqola-footer { display: flex; justify-content: space-between; align-items: center; }
+    .maqola-date { font-size: 13px; color: var(--text-muted); }
+    .maqola-link { font-size: 14px; font-weight: 600; color: var(--blue-main); display: flex; align-items: center; gap: 4px; }
+
+    /* ===== LIFEHACK ===== */
+    .lifehack { padding: 90px 0; background: var(--gray); }
+    .lifehack-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+    .lifehack-card { background: var(--white); border-radius: var(--radius); padding: 32px 28px; border-left: 4px solid var(--blue-main); transition: all 0.3s; }
+    .lifehack-card:hover { box-shadow: var(--shadow); transform: translateX(4px); }
+    .lifehack-num { font-size: 48px; font-weight: 800; color: var(--blue-light); line-height: 1; margin-bottom: 16px; }
+    .lifehack-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 10px; color: var(--text-dark); }
+    .lifehack-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+    .lifehack-icon { font-size: 32px; margin-bottom: 16px; }
+
+    /* ===== FAQ ===== */
+    .faq { padding: 90px 0; background: var(--white); }
+    .faq-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+    .faq-list { display: flex; flex-direction: column; gap: 12px; }
+    .faq-item { border: 1px solid rgba(60,75,220,0.15); border-radius: var(--radius); overflow: hidden; }
+    .faq-q { padding: 20px 24px; font-weight: 600; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; transition: background 0.2s; user-select: none; }
+    .faq-q:hover { background: var(--blue-light); }
+    .faq-q.active { background: var(--blue-main); color: var(--white); }
+    .faq-q .arrow { font-size: 18px; transition: transform 0.3s; flex-shrink: 0; }
+    .faq-q.active .arrow { transform: rotate(45deg); }
+    .faq-a { display: none; padding: 0 24px 20px; font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+    .faq-a.open { display: block; }
+    .faq-cta { background: linear-gradient(135deg, var(--blue-dark), var(--blue-main)); border-radius: 24px; padding: 40px 36px; color: var(--white); }
+    .faq-cta h3 { font-size: 26px; font-weight: 800; margin-bottom: 12px; }
+    .faq-cta p { opacity: 0.85; font-size: 15px; margin-bottom: 28px; line-height: 1.6; }
+
+    /* ===== XARITA ===== */
+    .xarita { padding: 90px 0; background: var(--gray); }
+    .xarita .container { display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; align-items: start; }
+    .filiallar-list { display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; padding-right: 8px; }
+    .filiallar-list::-webkit-scrollbar { width: 4px; }
+    .filiallar-list::-webkit-scrollbar-track { background: transparent; }
+    .filiallar-list::-webkit-scrollbar-thumb { background: var(--blue-main); border-radius: 4px; }
+    .filial-item { background: var(--white); border-radius: 12px; padding: 16px 20px; display: flex; gap: 12px; align-items: flex-start; border: 1px solid transparent; transition: all 0.2s; cursor: pointer; }
+    .filial-item:hover { border-color: var(--blue-main); box-shadow: var(--shadow); }
+    .filial-pin { width: 36px; height: 36px; background: var(--blue-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .filial-info strong { display: block; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .filial-info span { font-size: 13px; color: var(--text-muted); }
+    .filial-info a { font-size: 13px; color: var(--blue-main); font-weight: 600; }
+    .xarita-map { border-radius: 24px; overflow: hidden; height: 480px; background: var(--blue-light); }
+    .xarita-map iframe { width: 100%; height: 100%; border: none; }
+
+    /* ===== ETROF ===== */
+    .etrof { padding: 80px 0; background: var(--blue-dark); }
+    .etrof .container { display: flex; justify-content: space-between; align-items: center; gap: 32px; flex-wrap: wrap; }
+    .etrof h2 { font-size: clamp(24px,3vw,36px); font-weight: 800; color: var(--white); max-width: 500px; line-height: 1.3; }
+    .etrof-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+
+    /* ===== FOOTER ===== */
+    .footer { background: #0d1230; color: rgba(255,255,255,0.85); padding: 64px 0 32px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 48px; margin-bottom: 48px; }
+    .footer-brand .logo { color: var(--white); margin-bottom: 16px; }
+    .footer-brand p { font-size: 14px; opacity: 0.7; line-height: 1.7; margin-bottom: 20px; }
+    .socials { display: flex; gap: 10px; }
+    .social-btn { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.2s; }
+    .social-btn:hover { background: var(--blue-main); transform: translateY(-2px); }
+    .footer-col h5 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 16px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a { font-size: 14px; opacity: 0.7; transition: opacity 0.2s; }
+    .footer-col ul li a:hover { opacity: 1; color: #93c5fd; }
+    .footer-contact { display: flex; flex-direction: column; gap: 14px; }
+    .footer-contact-item { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; opacity: 0.75; }
+    .footer-contact-item .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 13px; opacity: 0.5; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .hero .container { grid-template-columns: 1fr; }
+      .hero-media { display: none; }
+      .vazifa .container { grid-template-columns: 1fr; }
+      .ekspertlar-grid { grid-template-columns: repeat(2,1fr); }
+      .statistika .container { grid-template-columns: repeat(2,1fr); }
+      .xarita .container { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .header-cta .btn-primary { display: none; }
+      .burger { display: flex; }
+      .hero { padding: 60px 0; }
+      .maqolalar-grid { grid-template-columns: 1fr; }
+      .lifehack-grid { grid-template-columns: 1fr; }
+      .faq-wrap { grid-template-columns: 1fr; }
+      .ekspertlar-grid { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .etrof .container { flex-direction: column; text-align: center; }
+      .topbar { display: none; }
+      .statistika .container { grid-template-columns: 1fr 1fr; }
+      .vazifa-cards { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .ekspertlar-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-info">
+      <span>📍 Toshkent, Mirzo-Ulug'bek tumani, Qorasuv mavzesi-4, 11-uy</span>
+      <a href="mailto:headoffice@suvchimaktabi.uz"><span>✉️ headoffice@suvchimaktabi.uz</span></a>
+      <a href="tel:1319"><span>📞 1319</span></a>
+    </div>
+    <div class="topbar-right">
+      <button class="lang-btn">🌐 O'z</button>
+      <button class="lang-btn">Ru</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="container">
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+        </svg>
+      </div>
+      Suvchilar maktabi
+    </a>
+    <nav>
+      <a href="#" class="active">Bosh sahifa</a>
+      <a href="#vazifa">Vazifamiz</a>
+      <a href="#maqolalar">Maqolalar</a>
+      <a href="#lifehack">Lifehack</a>
+      <a href="#ekspertlar">Ekspertlar</a>
+      <a href="#faq">FAQ</a>
+      <a href="#xarita">Filiallar</a>
+      <a href="#boglanish">Bog'lanish</a>
+    </nav>
+    <div class="header-cta">
+      <a href="#royxat" class="btn-primary">📅 Ro'yxatdan o'tish</a>
+      <div class="burger" onclick="openMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <span class="mobile-close" onclick="closeMenu()">✕</span>
+  <a href="#" onclick="closeMenu()">Bosh sahifa</a>
+  <a href="#vazifa" onclick="closeMenu()">Bizning vazifamiz</a>
+  <a href="#maqolalar" onclick="closeMenu()">Maqolalar</a>
+  <a href="#lifehack" onclick="closeMenu()">Lifehack'lar</a>
+  <a href="#ekspertlar" onclick="closeMenu()">Ekspertlar</a>
+  <a href="#faq" onclick="closeMenu()">FAQ</a>
+  <a href="#xarita" onclick="closeMenu()">Filiallar</a>
+  <a href="#boglanish" onclick="closeMenu()">Bog'lanish</a>
+  <a href="#royxat" class="btn-primary" style="margin-top:12px;justify-content:center;" onclick="closeMenu()">📅 Ro'yxatdan o'tish</a>
+</div>
+
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span></span> O'zbekiston bo'ylab 13 ta hududiy markaz
+      </div>
+      <h1>
+        Zamonaviy <span>suv tejovchi</span><br>sug'orish texnologiyalarini o'rganing
+      </h1>
+      <p class="hero-desc">
+        Respublikaning 13 ta hududidagi tajriba maydonlarida tomchilatib, yomg'irlatib va diskret sug'orish usullarini chuqur o'rganing. Xorijiy va mahalliy ekspertlardan bilim oling.
+      </p>
+      <div class="hero-btns">
+        <a href="#royxat" class="btn-white">📋 Ro'yxatdan o'tish</a>
+        <a href="#vazifa" class="btn-ghost">▶ Batafsil ma'lumot</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="13">0</div>
+          <div class="hero-stat-label">Hududiy markaz</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="5000">0</div>
+          <div class="hero-stat-label">O'quvchilar</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="20">0</div>
+          <div class="hero-stat-label">Gektarlik tajriba maydoni</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="30">0</div>
+          <div class="hero-stat-label">% gacha suv tejash</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-media">
+      <div class="hero-media-item">
+        <div class="hero-media-placeholder">🌿</div>
+      </div>
+      <div class="hero-media-item">
+        <div class="hero-media-placeholder">💧</div>
+      </div>
+      <div class="hero-media-item">
+        <div class="hero-media-placeholder">🌾</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- BIZNING VAZIFAMIZ -->
+<section class="vazifa" id="vazifa">
+  <div class="container">
+    <div class="vazifa-text">
+      <span class="section-label">Bizning vazifamiz</span>
+      <h2 class="section-title">Qishloq xo'jaligida suv tejashni o'rgatamiz</h2>
+      <p class="section-desc">
+        Qishloq xo'jaligida bugungi kunda yuqori hosil olish, suv va energiyadan oqilona foydalanish, sug'oriladigan yerlar holatini yaxshilashga alohida e'tibor qaratilmoqda. Oliy o'quv yurtlari va xorijiy mutaxassislar bilan hamkorlikda amalga oshirilayotgan mazkur loyiha — fermer va mutaxassislarga zamonaviy sug'orish usullarini o'rgatish, malaka oshirish va ishlab chiqarish samaradorligini oshirishga xizmat qilmoqda.
+      </p>
+      <div class="vazifa-cards" style="margin-top:36px;">
+        <div class="vazifa-card">
+          <div class="vazifa-card-icon">🎓</div>
+          <h4>Ta'lim</h4>
+          <p>Tinglovchilar qulay va bepul ta'lim oladi. Xorijiy standartlar asosida tayyorlangan dasturlar.</p>
+        </div>
+        <div class="vazifa-card">
+          <div class="vazifa-card-icon">🌍</div>
+          <h4>Xalqaro ekspertlar</h4>
+          <p>O'quv kursida xorijiy va mahalliy professorlar bilim berib borishadi.</p>
+        </div>
+        <div class="vazifa-card">
+          <div class="vazifa-card-icon">🚗</div>
+          <h4>Mobillik</h4>
+          <p>Biz fermerlarga qulaylikni taqdim etamiz. Siz o'quv kursini o'zingiz yashayotgan hududda o'qish imkoniyatiga egasiz.</p>
+        </div>
+        <div class="vazifa-card">
+          <div class="vazifa-card-icon">📜</div>
+          <h4>Sertifikat</h4>
+          <p>Kursni tamomlagan ishtirokchilarni sog'a va sertifikat bilan taqdirlaymiz.</p>
+        </div>
+      </div>
+      <div style="margin-top:32px;">
+        <a href="#royxat" class="btn-primary">Hoziroq ro'yxatdan o'ting →</a>
+      </div>
+    </div>
+    <div class="vazifa-img">
+      <img src="https://via.placeholder.com/600x480/3c4bdc/ffffff?text=Tajriba+maydoni" alt="Tajriba maydoni" />
+      <div class="vazifa-img-badge">
+        <strong>🏆 "Oltin Chinor" mukofoti sohibi</strong>
+        <span>Toshkentforum — O'zbekistonlik 2024 forumida e'tirof etildi</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- STATISTIKA -->
+<section class="statistika" id="statistika">
+  <div class="container">
+    <div class="stat-item">
+      <div class="stat-num"><span data-count="13">0</span>+</div>
+      <div class="stat-label">Hududiy markaz<br>O'zbekiston bo'ylab</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span data-count="5000">0</span>+</div>
+      <div class="stat-label">O'quvchilar<br>bitirgan</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span data-count="20">0</span></div>
+      <div class="stat-label">Gektarlik tajriba<br>maydoni</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span data-count="40">0</span>%</div>
+      <div class="stat-label">Gacha suv<br>tejash imkoni</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- EKSPERTLAR -->
+<section class="ekspertlar" id="ekspertlar">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Bizning jamoamiz</span>
+      <h2 class="section-title">Xalqaro ekspertlarimiz</h2>
+      <p class="section-desc">Xalqaro ekspertlar chuqur bilim va ko'nikmaga ega. Ularning yordami bilan respublikamizdagi ko'plab fermer zo'pliklar rahbar va suvchilar zamonaviy sug'orish tizimini o'rganmoqda.</p>
+    </div>
+    <div class="ekspertlar-grid">
+      <div class="ekspert-card">
+        <div class="ekspert-img">
+          <img src="https://via.placeholder.com/300x240/3c4bdc/ffffff?text=Ekspert+1" alt="Ekspert" />
+        </div>
+        <div class="ekspert-info">
+          <h4>Abdullayev Hamid</h4>
+          <div class="role">Bosh mutaxassis — Tomchilatib sug'orish</div>
+          <div class="country">🇺🇿 O'zbekiston · 15 yil tajriba</div>
+        </div>
+      </div>
+      <div class="ekspert-card">
+        <div class="ekspert-img">
+          <img src="https://via.placeholder.com/300x240/5078ff/ffffff?text=Ekspert+2" alt="Ekspert" />
+        </div>
+        <div class="ekspert-info">
+          <h4>Karimov Sherzod</h4>
+          <div class="role">Professor — Irrigatsiya tizimlari</div>
+          <div class="country">🇺🇿 O'zbekiston · 20 yil tajriba</div>
+        </div>
+      </div>
+      <div class="ekspert-card">
+        <div class="ekspert-img">
+          <img src="https://via.placeholder.com/300x240/3c4bdc/ffffff?text=Ekspert+3" alt="Ekspert" />
+        </div>
+        <div class="ekspert-info">
+          <h4>Dr. Rustam Nazarov</h4>
+          <div class="role">Xalqaro maslahatchi — Suv resurslar</div>
+          <div class="country">🇩🇪 Germaniya · 18 yil tajriba</div>
+        </div>
+      </div>
+      <div class="ekspert-card">
+        <div class="ekspert-img">
+          <img src="https://via.placeholder.com/300x240/5078ff/ffffff?text=Ekspert+4" alt="Ekspert" />
+        </div>
+        <div class="ekspert-info">
+          <h4>Yusupov Bahodir</h4>
+          <div class="role">Agronomist — Zamonaviy sug'orish</div>
+          <div class="country">🇮🇱 Isroil · 12 yil tajriba</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- MAQOLALAR -->
+<section class="maqolalar" id="maqolalar">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Bilim markazi</span>
+      <h2 class="section-title">So'nggi maqolalar</h2>
+      <p class="section-desc">Suv tejovchi sug'orish texnologiyalari, agrotexnika va qishloq xo'jaligi bo'yicha foydali maqolalar.</p>
+    </div>
+    <div class="maqolalar-grid">
+      <div class="maqola-card">
+        <div class="maqola-img">💧</div>
+        <div class="maqola-body">
+          <span class="maqola-cat">Texnologiya</span>
+          <h3>Tuproq holatini kuzatish — suvdan oqilona foydalanish va hosildorlikni oshirishning muhim omili</h3>
+          <p>Zamonaviy sensor texnologiyalari yordamida tuproqdagi namlik darajasini real vaqtda kuzatish sug'orish samaradorligini sezilarli oshiradi.</p>
+          <div class="maqola-footer">
+            <span class="maqola-date">📅 2026-05-14</span>
+            <a href="#" class="maqola-link">O'qish →</a>
+          </div>
+        </div>
+      </div>
+      <div class="maqola-card">
+        <div class="maqola-img">⚙️</div>
+        <div class="maqola-body">
+          <span class="maqola-cat">Uskunalar</span>
+          <h3>Dinamik nasoslar qanday bo'ladi? Fermer uchun to'liq qo'llanma</h3>
+          <p>Sug'orish tizimlarida ishlatiladigan nasoslar turlari, ularning afzalliklari va qaysi holatda qaysi nasosni tanlash kerakligi haqida.</p>
+          <div class="maqola-footer">
+            <span class="maqola-date">📅 2026-03-27</span>
+            <a href="#" class="maqola-link">O'qish →</a>
+          </div>
+        </div>
+      </div>
+      <div class="maqola-card">
+        <div class="maqola-img">🏛️</div>
+        <div class="maqola-body">
+          <span class="maqola-cat">Yangilik</span>
+          <h3>Mudofaa vazirligi mutasaddilari "Suvchilar maktabi"da tashrif buyurdi</h3>
+          <p>Vakillar tajriba maydonlarida amalga oshirilayotgan ishlar bilan tanishib, zamonaviy sug'orish texnologiyalarining ahamiyatini ta'kidladi.</p>
+          <div class="maqola-footer">
+            <span class="maqola-date">📅 2026-03-05</span>
+            <a href="#" class="maqola-link">O'qish →</a>
+          </div>
+        </div>
+      </div>
+      <div class="maqola-card">
+        <div class="maqola-img">🌱</div>
+        <div class="maqola-body">
+          <span class="maqola-cat">Amaliyot</span>
+          <h3>Tomchilatib sug'orish: o'rnatishdan foydalanishgacha bo'lgan to'liq jarayon</h3>
+          <p>Tomchilatib sug'orish tizimini o'rnatish bosqichlari, texnik talablar va iqtisodiy samaradorligi haqida batafsil.</p>
+          <div class="maqola-footer">
+            <span class="maqola-date">📅 2026-02-18</span>
+            <a href="#" class="maqola-link">O'qish →</a>
+          </div>
+        </div>
+      </div>
+      <div class="maqola-card">
+        <div class="maqola-img">🌦️</div>
+        <div class="maqola-body">
+          <span class="maqola-cat">Texnologiya</span>
+          <h3>Yomg'irlatib sug'orish: qaysi ekinlar uchun eng mos keladi?</h3>
+          <p>Yomg'irlatib sug'orish texnologiyasining afzalliklari, kamchiliklari va turli ekinlarga moslashtirilgan yechimlar.</p>
+          <div class="maqola-footer">
+            <span class="maqola-date">📅 2026-01-30</span>
+            <a href="#" class="maqola-link">O'qish →</a>
+          </div>
+        </div>
+      </div>
+      <div class="maqola-card">
+        <div class="maqola-img">📊</div>
+        <div class="maqola-body">
+          <span class="maqola-cat">Tahlil</span>
+          <h3>Smart sug'orish tizimlarini joriy qilgan fermerlarning tajribasi</h3>
+          <p>O'zbekistonlik fermerlar qanday qilib suv tejovchi texnologiyalar orqali hosildorlikni 2-3 baravarga oshirdi — real misollar.</p>
+          <div class="maqola-footer">
+            <span class="maqola-date">📅 2025-12-10</span>
+            <a href="#" class="maqola-link">O'qish →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="#" class="btn-outline">Barcha maqolalarni ko'rish →</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- LIFEHACK'LAR -->
+<section class="lifehack" id="lifehack">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Amaliy maslahatlar</span>
+      <h2 class="section-title">Sug'orish bo'yicha lifehack'lar</h2>
+      <p class="section-desc">Fermerlar va dehqonlar uchun suv tejash va hosildorlikni oshirishga yordam beradigan amaliy maslahatlar.</p>
+    </div>
+    <div class="lifehack-grid">
+      <div class="lifehack-card">
+        <div class="lifehack-icon">💧</div>
+        <div class="lifehack-num">01</div>
+        <h4>Erta tongda sug'oring</h4>
+        <p>Sug'orishni ertalab soat 5–8 da amalga oshiring. Bu vaqtda bug'lanish minimal bo'lib, suv bevosita ildizga yetib boradi. Kunduzi sug'orishda suvning 30–40% bug'lanib ketadi.</p>
+      </div>
+      <div class="lifehack-card">
+        <div class="lifehack-icon">🌡️</div>
+        <div class="lifehack-num">02</div>
+        <h4>Tuproq namligini tekshiring</h4>
+        <p>Barmoqingizni 5 sm chuqurlikka tiqib ko'ring — agar nam bo'lsa, sug'orish shart emas. Har kuni sug'orish tuproqni tuzlashtiradi va ekin ildizini zaiflashtirsadi.</p>
+      </div>
+      <div class="lifehack-card">
+        <div class="lifehack-icon">🪨</div>
+        <div class="lifehack-num">03</div>
+        <h4>Mulchlash — suv tejashning eng oddiy usuli</h4>
+        <p>Ekin atrofiga somon, qipiq yoki qora plyonka yoping. Mulch tuproqdan bug'lanishni 50% gacha kamaytiradi va begona o'tlarning o'sishini to'xtatadi.</p>
+      </div>
+      <div class="lifehack-card">
+        <div class="lifehack-icon">📏</div>
+        <div class="lifehack-num">04</div>
+        <h4>Tomchi trubkalarini to'g'ri joylashtiring</h4>
+        <p>Tomchilatib sug'orishda trubkani ildiz zonasidan 10–15 sm nariroqqa qo'ying. Bu suv to'g'ridan to'g'ri ildizga singib, yon tomonlarga tarqalmasligini ta'minlaydi.</p>
+      </div>
+      <div class="lifehack-card">
+        <div class="lifehack-icon">🔧</div>
+        <div class="lifehack-num">05</div>
+        <h4>Tizimni har oyda tekshirib turing</h4>
+        <p>Tomchi emitterlarni tiqilib qolishining oldini olish uchun har oyda filtrlash tizimini tozalang. Bir tiqilib qolgan emitter ekinni quritib qo'yishi mumkin.</p>
+      </div>
+      <div class="lifehack-card">
+        <div class="lifehack-icon">📱</div>
+        <div class="lifehack-num">06</div>
+        <h4>Smart taymerni ulang</h4>
+        <p>Avtomatik taymer o'rnatish orqali sug'orishni aniq vaqtda va aniq miqdorda sozlang. Bu insoniy xatoni kamaytiradi va suvdan foydalanishni 25–35% tejaydi.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Ko'p so'raladigan savollar</span>
+      <h2 class="section-title">Savol va javoblar</h2>
+      <p class="section-desc">Kurslarimiz va xizmatlarimiz haqida eng ko'p beriladigan savollarga javoblar.</p>
+    </div>
+    <div class="faq-wrap">
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Kurslar bepulmi? <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">Ha, "Suvchilar maktabi" kurslari fermer va dehqonlar uchun mutlaqo bepul. Barcha o'quv materiallari, ekspert darslari va sertifikat ham bepul taqdim etiladi.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Kurslarda kimlar qatnasha oladi? <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">Fermerlar, dehqon xo'jaligi rahbarlari, agronomiyka sohasidagi mutaxassislar va suv xo'jaligi bo'yicha bilim olmoqchi bo'lgan har bir kishi qatnasha oladi.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Kurslar qayerda o'tkaziladi? <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">Kurslar O'zbekistonning 13 ta hududiy markazida o'tkaziladi. Siz o'zingiz yashayotgan viloyatdagi markazda o'qish imkoniyatiga egasiz. Markazlar ro'yxatini "Filiallar" bo'limida ko'rishingiz mumkin.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Kurs davomiyligi qancha? <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">Kurs davomiyligi 5 kundan 2 haftagacha bo'lishi mumkin, sug'orish texnologiyasi turiga qarab. Amaliy mashg'ulotlar tajriba maydonlarida o'tkaziladi.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Qanday sug'orish texnologiyalari o'rgatiladi? <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">Tomchilatib sug'orish (drip irrigation), yomg'irlatib sug'orish (sprinkler), diskret (tanaffusli) sug'orish va smart avtomatik sug'orish tizimlari o'rgatiladi.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Kursni tugatgandan so'ng sertifikat beriladi? <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">Ha, kursni muvaffaqiyatli tamomlagan barcha ishtirokchilarga rasmiy sertifikat topshiriladi. Sertifikat raqamini saytimizda tekshirish mumkin.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Ro'yxatdan qanday o'tish mumkin? <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">Saytdagi "Ro'yxatdan o'tish" tugmasini bosib, 3 bosqichli formani to'ldiring: telefon raqam, STIR, fermer xo'jaligi ma'lumotlari va kurs tanlang. Yoki 1319 raqamiga qo'ng'iroq qiling.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            Sertifikatni qanday yuklab olish mumkin? <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">Saytning pastki qismidagi "Sertifikatni yuklab olish" bo'limiga o'tib, sertifikat raqamingizni kiriting va "Yuklash" tugmasini bosing.</div>
+        </div>
+      </div>
+      <div class="faq-cta">
+        <h3>Savolingiz javobini topa olmadingizmi?</h3>
+        <p>Bizning mutaxassislarimiz istalgan vaqtda sizga yordam berishga tayyor. Qo'ng'iroq qiling yoki xabar yuboring.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <a href="tel:1319" class="btn-white">📞 1319 ga qo'ng'iroq</a>
+          <a href="mailto:headoffice@suvchimaktabi.uz" class="btn-ghost" style="border-color:rgba(255,255,255,0.4);color:white;">✉️ Email yozish</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- XARITA VA FILIALLAR -->
+<section class="xarita" id="xarita">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Hududiy markazlar</span>
+      <h2 class="section-title">O'zbekiston bo'ylab 13 ta markaz</h2>
+      <p class="section-desc">Siz yashayotgan viloyatdagi hududiy markazimizga murojaat qiling.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:40px;align-items:start;">
+      <div class="filiallar-list">
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Toshkent hududiy markazi</strong>
+            <span>Mirzo-Ulug'bek tumani, Qorasuv mavzesi-4, 11-uy</span><br>
+            <a href="tel:+998977667086">+998 97 766 70 86</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Nukus hududiy markazi</strong>
+            <span>Qoraqalpog'iston Respublikasi, Nukus shahri, P.Saytov 12-da</span><br>
+            <a href="tel:+998937790790">+998 93 779 07 90</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Andijon hududiy markazi</strong>
+            <span>Andijon viloyati, Andijon tumani, Oyjamol MFY, Oliygox ko'chasi, 1-uy</span><br>
+            <a href="tel:+998937777514">+998 93 777 75 14</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Buxoro hududiy markazi</strong>
+            <span>Buxoro viloyati, Buxoro shahri, Gazi shox ko'chasi 32-uy</span><br>
+            <a href="tel:+998973020703">+998 97 302 07 03</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Jizzax hududiy markazi</strong>
+            <span>Jizzax viloyati, Jizzax shahri, Baynalminalchilar ko'chasi 18-uy</span><br>
+            <a href="tel:+998999549006">+998 99 954 90 06</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Qashqadaryo hududiy markazi</strong>
+            <span>Qarshi shahri, Paxtazor MFY, Xonobod shox ko'chasi 19-uy</span><br>
+            <a href="tel:+998904407200">+998 90 440 72 00</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Navoiy hududiy markazi</strong>
+            <span>Navoiy viloyati, Navoiy shahri, Nazomniy ko'chasi 24-uy</span><br>
+            <a href="tel:+998997420124">+998 99 742 01 24</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Namangan hududiy markazi</strong>
+            <span>Namangan viloyati, Namangan shahri, Islom Karimov ko'chasi 3-uy</span><br>
+            <a href="tel:+998945900908">+998 94 590 09 08</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Samarqand hududiy markazi</strong>
+            <span>Samarqand viloyati, Qodaryo tumani, Daxbet shaxarchesi, Amir Temur ko'chasi 7-uy</span><br>
+            <a href="tel:+998995914540">+998 99 591 45 40</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Sirdaryo hududiy markazi</strong>
+            <span>Sirdaryo viloyati, Guliston shahar, Xondamir ko'chasi 127-uy</span><br>
+            <a href="tel:+998933261349">+998 93 326 13 49</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Surxondaryo hududiy markazi</strong>
+            <span>Surxondaryo viloyati, Termiz tumani, Tajribakor ko'chasi 98-uy</span><br>
+            <a href="tel:+998974871718">+998 97 487 17 18</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Farg'ona hududiy markazi</strong>
+            <span>Farg'ona viloyati, Fargona shahar, Al Fargoniy kuchasi 72-uy</span><br>
+            <a href="tel:+998336330008">+998 33 633 00 08</a>
+          </div>
+        </div>
+        <div class="filial-item">
+          <div class="filial-pin">📍</div>
+          <div class="filial-info">
+            <strong>Xorazm hududiy markazi</strong>
+            <span>Xorazm viloyati, Kushkupir tuman, Sog'lom avlod kuchasi 40-uy</span><br>
+            <a href="tel:+998972119449">+998 97 211 94 49</a>
+          </div>
+        </div>
+      </div>
+      <div class="xarita-map">
+        <iframe
+          src="https://www.openstreetmap.org/export/embed.html?bbox=55.996%2C37.184%2C73.055%2C45.590&layer=mapnik"
+          allowfullscreen loading="lazy">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="etrof" id="royxat">
+  <div class="container">
+    <h2>Zamonaviy sug'orish texnologiyalarini o'rganishni bugun boshlang!</h2>
+    <div class="etrof-btns">
+      <a href="#" class="btn-white">📋 Ro'yxatdan o'tish</a>
+      <a href="tel:1319" class="btn-ghost" style="border-color:rgba(255,255,255,0.4);color:white;">📞 1319 ga qo'ng'iroq</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="footer" id="boglanish">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:16px;">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+            </svg>
+          </div>
+          Suvchilar maktabi
+        </div>
+        <p>Mazkur o'quv kursining o'quv dasturlari xalqaro ta'lim standartlarini hisobga olgan holda tayyorlangan bo'lib, o'quv jarayoni ilg'or pedagogik va axborot-kommunikatsiya texnologiyalaridan keng foydalangan holda tashkil etiladi.</p>
+        <div class="socials" style="margin-top:20px;">
+          <a href="#" class="social-btn" title="Facebook">📘</a>
+          <a href="#" class="social-btn" title="YouTube">▶️</a>
+          <a href="#" class="social-btn" title="Telegram">✈️</a>
+          <a href="#" class="social-btn" title="Instagram">📸</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Havolalar</h5>
+        <ul>
+          <li><a href="#">Bosh sahifa</a></li>
+          <li><a href="#vazifa">Biz haqimizda</a></li>
+          <li><a href="#">O'quv dasturi</a></li>
+          <li><a href="#maqolalar">Yangiliklar</a></li>
+          <li><a href="#">Video darslar</a></li>
+          <li><a href="#ekspertlar">Ekspertlar</a></li>
+          <li><a href="#">Kitoblar</a></li>
+          <li><a href="#boglanish">Bog'lanish</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Bo'limlar</h5>
+        <ul>
+          <li><a href="#maqolalar">Maqolalar</a></li>
+          <li><a href="#lifehack">Lifehack'lar</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#xarita">Filiallar</a></li>
+          <li><a href="#royxat">Ro'yxatdan o'tish</a></li>
+          <li><a href="#">Sertifikat tekshirish</a></li>
+          <li><a href="#">Kalendar</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Bog'lanish</h5>
+        <div class="footer-contact">
+          <div class="footer-contact-item">
+            <span class="icon">📍</span>
+            <span>Toshkent shahar, Mirzo-Ulug'bek tumani, Qorasuv mavzesi-4, 11-uy, Suv xo'jaligi vazirligi binosi</span>
+          </div>
+          <div class="footer-contact-item">
+            <span class="icon">📞</span>
+            <a href="tel:1319" style="color:inherit;">1319 (Qo'ng'iroq markazi)</a>
+          </div>
+          <div class="footer-contact-item">
+            <span class="icon">✉️</span>
+            <a href="mailto:headoffice@suvchimaktabi.uz" style="color:#93c5fd;">headoffice@suvchimaktabi.uz</a>
+          </div>
+          <div class="footer-contact-item">
+            <span class="icon">🕐</span>
+            <span>Dushanba–Juma: 09:00–18:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 "Suvchilar maktabi" MCHJ. Barcha huquqlar himoyalangan.</span>
+      <span>Developed by todi.uz</span>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  // ===== MOBILE MENU =====
+  function openMenu() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ===== FAQ ACCORDION =====
+  function toggleFaq(el) {
+    const allQ = document.querySelectorAll('.faq-q');
+    const allA = document.querySelectorAll('.faq-a');
+    const isActive = el.classList.contains('active');
+    allQ.forEach(q => q.classList.remove('active'));
+    allA.forEach(a => a.classList.remove('open'));
+    if (!isActive) {
+      el.classList.add('active');
+      el.nextElementSibling.classList.add('open');
+    }
+  }
+
+  // ===== COUNTER ANIMATION =====
+  function animateCounter(el, target, duration = 1800) {
+    let start = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) {
+        el.textContent = target.toLocaleString();
+        clearInterval(timer);
+      } else {
+        el.textContent = Math.floor(start).toLocaleString();
+      }
+    }, 16);
+  }
+
+  // Trigger counters when visible
+  const counters = document.querySelectorAll('[data-count]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        animateCounter(el, parseInt(el.dataset.count));
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => observer.observe(c));
+
+  // ===== STICKY HEADER SHADOW =====
+  window.addEventListener('scroll', () => {
+    const header = document.querySelector('.header');
+    if (window.scrollY > 10) {
+      header.style.boxShadow = '0 4px 24px rgba(60,75,220,0.12)';
+    } else {
+      header.style.boxShadow = '0 2px 16px rgba(60,75,220,0.07)';
+    }
+  });
+
+  // ===== ACTIVE NAV LINK =====
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      if (window.scrollY >= sec.offsetTop - 100) current = sec.getAttribute('id');
+    });
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+    });
+  });
+
+  // ===== SCROLL REVEAL =====
+  const revealEls = document.querySelectorAll(
+    '.vazifa-card, .ekspert-card, .maqola-card, .lifehack-card, .stat-item, .filial-item'
+  );
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }, i * 80);
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    revealObserver.observe(el);
+  });
+</script>
+</body>
 </html>
